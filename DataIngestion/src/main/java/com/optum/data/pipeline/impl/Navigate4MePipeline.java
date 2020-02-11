@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.apache.commons.io.FileUtils;
-import com.google.gson.Gson;
+import org.apache.kafka.clients.producer.RecordMetadata;
 
+import com.google.gson.Gson;
 import com.optum.data.pipeline.Pipeline;
 import com.optum.data.pipeline.pojo.Referral;
 import com.optum.data.pipeline.pojo.Referral.Headers;
@@ -16,9 +19,11 @@ import com.optum.icue.kafka.KafkaWriter;
 public class Navigate4MePipeline implements Pipeline {
 
 	public void pipeline() {
-		String sourceFilePath = "C:\\Users\\kbussire\\Desktop\\navigate4me\\Shikha\\ICUE-bulk-referrals-2019-05-12.txt";
+		//String sourceFilePath = "C:\\Users\\kbussire\\Desktop\\navigate4me\\Shikha\\ICUE-bulk-referrals-2019-05-12.txt";
+		String sourceFilePath = "/Users/srajanen/Documents/Kafka-Poc-master/DataIngestion/src/main/resources/ICUE-bulk-referrals-2019-05-12.txt";
 		//String destFilePath = "C:\\Users\\kbussire\\Desktop\\navigate4me\\Shikha\\ICUE-bulk-referrals-2019-05-12_out.txt";
-		String destFilePath = "C:\\Users\\kbussire\\Desktop\\navigate4me\\Shikha\\Target\\ICUE-bulk-referrals-2019-05-12_out.txt";
+		//String destFilePath = "C:\\Users\\kbussire\\Desktop\\navigate4me\\Shikha\\Target\\ICUE-bulk-referrals-2019-05-12_out.txt";
+		String destFilePath = "/Users/srajanen/Documents/Kafka-Poc-master/DataIngestion/src/main/resources/ICUE-bulk-referrals-2019-05-12_out.txt";
 		pipelineSteps(sourceFilePath,destFilePath);
 	}
 
@@ -40,9 +45,23 @@ public class Navigate4MePipeline implements Pipeline {
 		 * jsons.add(gson.toJson(((Referral)o))); }
 		 */
 		
-		System.out.println(json);
+		System.out.println("#####################"+json.length());
 		KafkaWriter kafkaWriter = new KafkaWriter();
-		kafkaWriter.write(json);
+		Future<RecordMetadata> record = kafkaWriter.write(json);
+		while(!record.isDone()) {
+			System.out.println("loopppp.....");
+		}
+		
+		System.out.println("$$$$$$$$$$ is done"+record.isDone());
+		try {
+			System.out.println("*************** : offset : "+record.get().offset());
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private List<Object> read(String filePath, String destFile) {
@@ -128,4 +147,5 @@ public class Navigate4MePipeline implements Pipeline {
 		
 	}
 	// return the JSON objects
+
 }

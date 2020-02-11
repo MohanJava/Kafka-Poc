@@ -27,8 +27,9 @@ public class KafkaWriter {
 
 	public KafkaWriter() {
 		try {
-			final String BOOTSTRAP_SERVERS = "localhost:9092"; // ExternalizedConfigsReader.getPropertyValueFromCache("/kafka.broker.list");
-			KAFKA_TOPIC_TO_PRODUCE = "mohan2";// ExternalizedConfigsReader.getPropertyValueFromCache("/kafka.produce.topic");
+			//final String BOOTSTRAP_SERVERS = "localhost:9092"; // ExternalizedConfigsReader.getPropertyValueFromCache("/kafka.broker.list");
+			final String BOOTSTRAP_SERVERS = "10.127.248.77:9092";
+			KAFKA_TOPIC_TO_PRODUCE = "test1";// ExternalizedConfigsReader.getPropertyValueFromCache("/kafka.produce.topic");
 			
 			//KAFKA_KEYSTORE_LOCATION = "src/main/resources/kafka/icue-alpha/icue-alpha.keystore.jks";
 			//KAFKA_KEYSTORE_PASSWORD = "l5fRlSiD6ytRtf6gJK++CQ";
@@ -59,7 +60,7 @@ public class KafkaWriter {
 	public Future<RecordMetadata> write(String message) {
 		try {
 			ProducerRecord<String, String> precord = new ProducerRecord<>(KAFKA_TOPIC_TO_PRODUCE,
-					UUID.randomUUID().toString().replaceAll("-", ""), message);
+					message);
 			Future<RecordMetadata> returnFuture = producer.send(precord, new KafkaCallBack() {
 			});
 			return returnFuture;
